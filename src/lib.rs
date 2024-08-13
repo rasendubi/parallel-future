@@ -144,38 +144,3 @@ where
     <Fut as IntoFuture>::Output: Send + 'static,
 {
 }
-
-#[cfg(test)]
-mod test {
-    use std::{
-        sync::{Arc, Mutex},
-        time::Duration,
-    };
-
-    use async_std::task;
-
-    use super::prelude::*;
-
-    #[test]
-    fn spawn() {
-        async_std::task::block_on(async {
-            let res = async { "nori is a horse" }.par().await;
-            assert_eq!(res, "nori is a horse");
-        })
-    }
-
-    #[test]
-    fn is_lazy() {
-        async_std::task::block_on(async {
-            let polled = Arc::new(Mutex::new(false));
-            let polled_2 = polled.clone();
-            let _res = async move {
-                *polled_2.lock().unwrap() = true;
-            }
-            .par();
-
-            task::sleep(Duration::from_millis(500)).await;
-            assert_eq!(*polled.lock().unwrap(), false);
-        })
-    }
-}

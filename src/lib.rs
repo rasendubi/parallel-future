@@ -102,6 +102,7 @@ impl<Fut: IntoFuture> PinnedDrop for ParallelFuture<Fut> {
     fn drop(self: Pin<&mut Self>) {
         let mut this = self.project();
         if let Some(handle) = this.handle.take() {
+            #[allow(clippy::let_underscore_future)]
             let _ = handle.cancel();
         }
     }
